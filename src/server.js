@@ -5,7 +5,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.send('hiiiii not sending the index.html file btw')
+  // res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 if (process.env.NODE_ENV !== 'test') {
