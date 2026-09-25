@@ -1,11 +1,12 @@
 name: Test, Build
 on:
   push:
-    branch:
+    branches:
       - master
   pull_request:
-    branch:
+    branches:
       - master
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
