@@ -1,21 +1,39 @@
-name: push image to dockerhub
+name: Deploy
 on:
-  push:
-    branches:
-      - master
+  workflow_run:
+    workflows: ["Test, Build"]
+    types: [completed]
+    # push:
+    #   branches:
+    #     - master
 
 jobs:
-  push-to-docker-hub:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v7
+      - name: download docker image
+        uses: actions/download-artifact@v7
+        with:
+          name: docker-image
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+      - run: |
+          docker load -i website-retro-image.tar
+          echo "docker image ready to deploy"
 
-      - name: login to dockerhub
-        run: echo  ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
-      - name: build docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/website-retro:latest .
-
-      - name: push docker image to registry
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/website-retro:latest
+  # push-to-docker-hub:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: checkout repo
+  #       uses: actions/checkout@v7
+  #
+  #     - name: login to dockerhub
+  #       run: echo  ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+  #
+  #     - name: build docker image
+  #       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/website-retro:latest .
+  #
+  #     - name: push docker image to registry
+  #       run: docker push ${{ secrets.DOCKER_USERNAME }}/website-retro:latest
