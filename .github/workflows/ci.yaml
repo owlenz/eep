@@ -23,4 +23,13 @@ jobs:
       - name: run unit tests
         run: npm test
       - name: build docker image
-        run: docker build -t website-retro .
+        run: |
+          docker build -t website-retro .
+          docker save website-retro -o website-retro-image.tar
+
+      - name: upload docker image file
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-image
+          path: website-retro-image.tar
+
